@@ -35,6 +35,8 @@ async function onThingEvent (data) {
   }
 }
 
-const client = redis.createClient(RedisUrl)
+const client = redis.createClient({ 
+  url: RedisUrl
+})
 client.connect()
 client.subscribe(ThingRegistryTopic, onThingEvent)
