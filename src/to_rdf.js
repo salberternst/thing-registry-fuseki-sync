@@ -21,13 +21,24 @@ async function documentLoader (url) {
   nodeDocumentLoader(url)
 }
 
+function fixUrns (description, id) {
+  // a bug in jsonld prevents the usage of urns as base uris
+  // we need to traverse over all @id and replace all urn:/
+
+  // instead of traversing the whole object we convert it to a string and fix all urns there.
+  const str = JSON.stringify(description).replace(/urn:\//g, `${id}/`)
+  return JSON.parse(str)
+}
+
 async function toRDF (description) {
   const expanded = await jsonld.expand(description, {
     documentLoader,
     base: description.id
   })
 
-  return jsonld.toRDF(expanded, { format: 'application/n-quads' })
+  return jsonld.toRDF(fixUrns(expanded, description.id), {
+    format: 'application/n-quads'
+  })
 }
 
 exports = module.exports = toRDF
