@@ -26,7 +26,7 @@ function fixUris (description, id) {
   // we need to traverse over all @id and replace all urn:/
 
   // instead of traversing the whole object we convert it to a string and fix all urns there.
-  const str = JSON.stringify(description).replace(/uri:\//g, `${id}/`)
+  const str = JSON.stringify(description).replace(/uri:/g, `${id}/`)
   return JSON.parse(str)
 }
 
