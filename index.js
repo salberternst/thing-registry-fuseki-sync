@@ -35,8 +35,16 @@ async function onThingEvent (data) {
   }
 }
 
-const client = redis.createClient({
-  url: RedisUrl
-})
-client.connect()
-client.subscribe(ThingRegistryTopic, onThingEvent)
+async function run () {
+  const client = redis.createClient({
+    url: RedisUrl,
+    pingInterval: 5000
+  })
+
+  await client.connect()
+  await client.subscribe(ThingRegistryTopic, onThingEvent)
+}
+
+run()
+  .then(() => console.log('Running'))
+  .catch((e) => console.error(e))
