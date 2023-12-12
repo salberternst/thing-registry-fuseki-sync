@@ -11,10 +11,10 @@ const RedisUrl = env.get('REDIS_URL').required(true).asString()
 const ThingRegistryTopic = 'thing_registry'
 
 const queue = new Queue('thing-description-push', {
-  redis: redis.createClient({
-    url: RedisUrl,
-    pingInterval: 5000
-  })
+  redis: {
+    host: 'redis-master.core.svc.cluster.local',
+    port: 6379
+  },
 })
 
 queue.process(async (job) => {
