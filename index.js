@@ -2,19 +2,27 @@
 
 const env = require('env-var')
 const redis = require('redis')
+const Queue = require('bee-queue')
+
 const toRDF = require('./src/to_rdf')
 const { addThingDescription, deleteThingDescription } = require('./src/fuseki')
 
 const RedisUrl = env.get('REDIS_URL').required(true).asString()
 const ThingRegistryTopic = 'thing_registry'
 
-async function onThingEvent (data) {
+const queue = new Queue('thing-description-push', {
+  redis: redis.createClient({
+    url: RedisUrl,
+    pingInterval: 5000
+  })
+})
+
+queue.process(async (job) => {
   try {
-    const event = JSON.parse(data)
-    switch (event.eventType) {
+    switch (job.data.eventType) {
       case 'create':
       case 'update': {
-        const { publicDescription, description, tenantId } = event
+        const { publicDescription, description, tenantId } = job.data
         const rdfTriplesPublicThing = await toRDF(publicDescription)
         const rdfTriplesThing = await toRDF(description)
 
@@ -28,12 +36,23 @@ async function onThingEvent (data) {
       }
 
       case 'remove': {
-        const { id, tenantId } = event
+        const { id, tenantId } = job.data
         await deleteThingDescription(id, `${tenantId}-public`)
         await deleteThingDescription(id, tenantId)
         break
       }
     }
+  } catch (e) {
+    console.error(e)
+  } finally {
+    console.log('Jobs done')
+    return Promise.resolve()
+  }
+})
+
+async function onThingEvent (data) {
+  try {
+    await queue.createJob(JSON.parse(data)).save()
   } catch (e) {
     console.error(e)
   }

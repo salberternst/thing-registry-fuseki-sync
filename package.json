@@ -1,6 +1,6 @@
 {
   "name": "thing-registry-fuseki-sync",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Synchronizes the thing registry with fuseki",
   "main": "index.js",
   "scripts": {
@@ -14,6 +14,7 @@
   "author": "Sebastian Alberternst <sebastian.alberternst@dfki.de>",
   "license": "MIT",
   "dependencies": {
+    "bee-queue": "^1.7.1",
     "env-var": "^7.4.1",
     "form-urlencoded": "^6.1.3",
     "jsonld": "^8.3.1",
