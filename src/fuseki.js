@@ -24,7 +24,9 @@ async function update (query, dataset) {
   })
 
   if (!response.ok) {
-    throw new Error('Error running update query')
+    throw new Error(
+      `Error running update query. Status ${response.status} Text ${response.statusText}`
+    )
   }
 
   return response
