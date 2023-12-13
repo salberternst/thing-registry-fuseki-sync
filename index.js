@@ -12,7 +12,8 @@ const ThingRegistryTopic = 'thing_registry'
 
 const queue = new Queue('thing-description-push', {
   redis: {
-    url: RedisUrl
+    url: RedisUrl,
+    pingInterval: 5000
   }
 })
 
