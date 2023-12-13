@@ -12,8 +12,7 @@ const ThingRegistryTopic = 'thing_registry'
 
 const queue = new Queue('thing-description-push', {
   redis: {
-    host: 'redis-master.core.svc.cluster.local',
-    port: 6379
+    url: RedisUrl
   }
 })
 
