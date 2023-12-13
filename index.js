@@ -14,7 +14,7 @@ const queue = new Queue('thing-description-push', {
   redis: {
     host: 'redis-master.core.svc.cluster.local',
     port: 6379
-  },
+  }
 })
 
 queue.process(async (job) => {
@@ -22,7 +22,9 @@ queue.process(async (job) => {
     switch (job.data.eventType) {
       case 'create':
       case 'update': {
-        const { publicDescription, description, tenantId } = job.data
+        const { publicDescription, description, tenantId, customerId } =
+          job.data
+        // build public and private rdf triples from thing description
         const rdfTriplesPublicThing = await toRDF(publicDescription)
         const rdfTriplesThing = await toRDF(description)
 
@@ -31,23 +33,40 @@ queue.process(async (job) => {
           rdfTriplesPublicThing,
           `${tenantId}-public`
         )
+
+        // add thing description to tenant
         await addThingDescription(description.id, rdfTriplesThing, tenantId)
+
+        // add thing description to customer endpoint
+        if (customerId) {
+          await addThingDescription(
+            description.id,
+            rdfTriplesThing,
+            `${tenantId}-${customerId}`
+          )
+        }
+
         break
       }
 
       case 'remove': {
-        const { id, tenantId } = job.data
+        const { id, tenantId, customerId } = job.data
+
         await deleteThingDescription(id, `${tenantId}-public`)
         await deleteThingDescription(id, tenantId)
+
+        if (customerId) {
+          await deleteThingDescription(id, `${tenantId}-${customerId}`)
+        }
+
         break
       }
     }
   } catch (e) {
     console.error(e)
-  } finally {
-    console.log('Jobs done')
-    return Promise.resolve()
   }
+
+  return Promise.resolve()
 })
 
 async function onThingEvent (data) {
