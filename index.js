@@ -22,11 +22,15 @@ queue.process(async (job) => {
     switch (job.data.eventType) {
       case 'create':
       case 'update': {
+        console.log(job.data)
         const { publicDescription, description, tenantId, customerId } =
           job.data
         // build public and private rdf triples from thing description
         const rdfTriplesPublicThing = await toRDF(publicDescription)
         const rdfTriplesThing = await toRDF(description)
+
+        console.log(rdfTriplesPublicThing)
+        console.log(rdfTriplesThing)
 
         await addThingDescription(
           publicDescription.id,
