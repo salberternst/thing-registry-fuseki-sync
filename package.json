@@ -1,6 +1,6 @@
 {
   "name": "thing-registry-fuseki-sync",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "Synchronizes the thing registry with fuseki",
   "main": "index.js",
   "scripts": {

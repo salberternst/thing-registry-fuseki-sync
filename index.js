@@ -31,6 +31,10 @@ queue.process(async (job) => {
         const rdfTriplesPublicThing = await toRDF(publicDescription, baseUrl)
         const rdfTriplesThing = await toRDF(description, baseUrl)
 
+        console.log(rdfTriplesPublicThing)
+        console.log('---')
+        console.log(rdfTriplesThing)
+
         await addThingDescription(
           publicDescription.id,
           rdfTriplesPublicThing,
