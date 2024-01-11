@@ -8,6 +8,8 @@ const toRDF = require('./src/to_rdf')
 const { addThingDescription, deleteThingDescription } = require('./src/fuseki')
 
 const RedisUrl = env.get('REDIS_URL').required(true).asString()
+const BaseUrl = env.get('BASE_URL').required(true).asString()
+
 const ThingRegistryTopic = 'thing_registry'
 
 const queue = new Queue('thing-description-push', {
@@ -22,15 +24,11 @@ queue.process(async (job) => {
     switch (job.data.eventType) {
       case 'create':
       case 'update': {
-        console.log(job.data)
         const { publicDescription, description, tenantId, customerId } =
           job.data
         // build public and private rdf triples from thing description
-        const rdfTriplesPublicThing = await toRDF(publicDescription)
-        const rdfTriplesThing = await toRDF(description)
-
-        console.log(rdfTriplesPublicThing)
-        console.log(rdfTriplesThing)
+        const rdfTriplesPublicThing = await toRDF(publicDescription, BaseUrl)
+        const rdfTriplesThing = await toRDF(description, BaseUrl)
 
         await addThingDescription(
           publicDescription.id,
