@@ -21,10 +21,18 @@ async function documentLoader (url) {
   nodeDocumentLoader(url)
 }
 
+function ensureTrailingSlash (str) {
+  if (str.endsWith('/')) {
+    return str
+  } else {
+    return str + '/'
+  }
+}
+
 async function toRDF (description, base) {
   const expanded = await jsonld.expand(description, {
     documentLoader,
-    base
+    base: ensureTrailingSlash(base)
   })
 
   return jsonld.toRDF(expanded, {
